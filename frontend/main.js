@@ -1,6 +1,6 @@
 let modal = document.getElementById("loginModal");
 let btn = document.getElementById("loginBtn");
-let span = document.getElementsByClassName("close")[0];
+let span = document.getElementsByClassName("close-btn")[0];
 
 btn.onclick = function() {
     modal.style.display = "block";

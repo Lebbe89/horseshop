@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <title>Dashboard</title>
 </head>
 <body>
@@ -29,6 +30,7 @@
             <span class="close-btn" onclick="closeModal()">&times;</span>
             <h2>Eintrag bearbeiten</h2>
             <form id="editForm">
+                <input type="date" id="dateField" name="dateField">
                 <input type="hidden" id="editId">
                 <label for="editField1">Feld 1:</label>
                 <input type="text" id="editField1" required>
@@ -40,7 +42,7 @@
             </form>
         </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="dashboard.js"></script>
 </body>
 

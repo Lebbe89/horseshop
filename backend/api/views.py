@@ -20,18 +20,18 @@ class FoodViewSet(viewsets.ModelViewSet):
     serializer_class = FoodSerializer
     permission_classes = [AllowAny]
 
-class EmployeeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializer
-    permission_classes = [IsAuthenticated]
+# class EmployeeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Employee.objects.all()
+#     serializer_class = EmployeeSerializer
+#     permission_classes = [IsAuthenticated]
 
-class HorseDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Horse.objects.all()
-    serializer_class = HorseSerializer
-    permission_classes = [IsAuthenticated]
+# class HorseDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Horse.objects.all()
+#     serializer_class = HorseSerializer
+#     permission_classes = [IsAuthenticated]
 
-class FoodDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Food.objects.all()
-    serializer_class = FoodSerializer
-    permission_classes = [IsAuthenticated]
+# class FoodDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Food.objects.all()
+#     serializer_class = FoodSerializer
+#     permission_classes = [IsAuthenticated]
 

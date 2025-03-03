@@ -4,7 +4,7 @@ class Horse(models.Model):
     breed = models.CharField(max_length=50,null=True)
     sex =models.CharField(max_length=50,null=True)
     location = models.CharField(max_length=50,null=True)
-    age = models.IntegerField(null=True)
+    birthdate = models.DateField(null=True)
     
     
 

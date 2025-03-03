@@ -343,7 +343,11 @@ function deleteFood(id) {
 
 function openModal(entity, id, data) {
     let formContainer = document.getElementById("editForm");
-
+    let closeButton = document.createElement("button");
+    closeButton.textContent = "Schließen";
+    closeButton.className = "close-btn";
+    closeButton.onclick = closeModal;
+    formContainer.appendChild(closeButton);
     if (!formContainer) {
         console.error("editForm wurde nicht gefunden.");
         return;
@@ -352,13 +356,14 @@ function openModal(entity, id, data) {
     formContainer.innerHTML = `
         <input type="hidden" id="editId" value="${id || ''}">
     `;
-
+    
+    // Daten initialisieren, wenn leer (z.B. für Hinzufügen)
     if (Object.keys(data).length === 0) {
         let headerCells = document.querySelectorAll("#table-header th");
         data = {};
         headerCells.forEach(cell => {
             let key = cell.textContent.toLowerCase().replace(/ /g, '_');
-            if (key !== "aktionen") { // "Aktionen" Spalte ignorieren
+            if (key !== "aktionen") {
                 data[key] = "";
             }
         });
@@ -372,18 +377,101 @@ function openModal(entity, id, data) {
             label.setAttribute("for", key);
             label.textContent = labelText + ":";
 
-            let input = document.createElement("input");
-            input.setAttribute("type", "text");
-            input.setAttribute("id", key);
-            input.setAttribute("name", key);
-            input.value = value;
-            input.required = true;
+            // Dropdown für "sex"
+            if (key === "sex") {
+                let select = document.createElement("select");
+                select.setAttribute("id", key);
+                select.setAttribute("name", key);
+                select.required = true;
 
-            formContainer.appendChild(label);
-            formContainer.appendChild(input);
+                let options = [
+                    { value: "", text: "Bitte wählen" },
+                    { value: "male", text: "Male" },
+                    { value: "female", text: "Female" }
+                ];
+
+                options.forEach(optionData => {
+                    let option = document.createElement("option");
+                    option.value = optionData.value;
+                    option.textContent = optionData.text;
+
+                    if (value === optionData.value) {
+                        option.selected = true;
+                    }
+
+                    select.appendChild(option);
+                });
+
+                formContainer.appendChild(label);
+                formContainer.appendChild(select);
+            }
+            // Dropdown für "location"
+            else if (key === "location") {
+                let select = document.createElement("select");
+                select.setAttribute("id", key);
+                select.setAttribute("name", key);
+                select.required = true;
+
+                let options = [
+                    { value: "", text: "Bitte wählen" },
+                    { value: "stable", text: "Stable" },
+                    { value: "slaughterhouse", text: "Slaughterhouse" }
+                ];
+
+                options.forEach(optionData => {
+                    let option = document.createElement("option");
+                    option.value = optionData.value;
+                    option.textContent = optionData.text;
+
+                    if (value === optionData.value) {
+                        option.selected = true;
+                    }
+
+                    select.appendChild(option);
+                });
+
+                formContainer.appendChild(label);
+                formContainer.appendChild(select);
+            }
+            // Alle anderen Felder als normale Input-Felder
+            else {
+                // Automatische Erkennung des Input-Typs anhand des Feldnamens
+                let inputType = "text"; // Standardtyp
+
+                if (key.includes("date")) {
+                    inputType = "text"; // Flatpickr benötigt text statt date
+                } else if (key.includes("email")) {
+                    inputType = "email";
+                } else if (key.includes("number") || key.includes("price") || key.includes("amount")) {
+                    inputType = "number";
+                } else if (key.includes("password")) {
+                    inputType = "password";
+                }
+
+                let input = document.createElement("input");
+                input.setAttribute("type", inputType);
+                input.setAttribute("id", key);
+                input.setAttribute("name", key);
+                input.value = value;
+                input.required = true;
+
+                formContainer.appendChild(label);
+                formContainer.appendChild(input);
+
+                // Flatpickr für Date-Felder initialisieren
+                if (key.includes("date")) {
+                    setTimeout(() => {
+                        flatpickr(`#${key}`, {
+                            dateFormat: "Y-m-d",
+                            allowInput: true
+                        });
+                    }, 0);
+                }
+            }
         }
     });
 
+    // Speichern-Button hinzufügen
     let saveButton = document.createElement("button");
     saveButton.setAttribute("type", "submit");
     saveButton.textContent = "Speichern";
