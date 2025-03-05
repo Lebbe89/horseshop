@@ -8,23 +8,30 @@
     <title>Dashboard</title>
 </head>
 <body>
-    <h1>Dashboard</h1>
-    <div class="tabs">
-        <button onclick="loadFood()">Food</button>
-        <button onclick="loadHorse()">Horse</button>
-        <button onclick="loadEmployee()">Employee</button>
-   
+    <h1> </h1>
+    <div class="table-wrapper">
+        <h1 id="page-title">Dashboard</h1> <!-- Dynamische Überschrift -->
+        <div class="button-container">
+            <div id="tabs" class="tabs">
+                <button id="fhe-button" onclick="loadFood()">Food</button>
+                <button id="fhe-button" onclick="loadHorse()">Horse</button>
+                <button id="fhe-button" onclick="loadEmployee()">Employee</button>
+                <input class="search-container" type="text" id="searchInput" placeholder="Search...">
+                <button id="fhe-button" onclick="filterTable()">Search</button>
+                
+            </div>
+            <div id="table-container"></div>
+        </div>
+    
+        <table>
+            <thead id="table-header">
+                <!-- Dynamische Tabellenköpfe werden hier eingefügt -->
+            </thead>
+            <tbody id="table-body">
+                <!-- Hier kommen die Daten hin -->
+            </tbody>
+        </table>
     </div>
-    <div id="table-container"></div>
-    <table>
-        <thead id="table-header">
-            <!-- Dynamische Tabellenköpfe werden hier eingefügt -->
-        </thead>
-        <tbody id="table-body">
-            <!-- Hier kommen die Daten hin -->
-        </tbody>
-    </table>
-
     <div id="editModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -33,10 +40,10 @@
                 <input type="date" id="dateField" name="dateField">
                 <input type="hidden" id="editId">
                 <label for="editField1">Feld 1:</label>
-                <input type="text" id="editField1" required>
+                <input type="text" id="editField1">
 
                 <label for="editField2">Feld 2:</label>
-                <input type="text" id="editField2" required>
+                <input type="text" id="editField2">
 
                 <button type="submit">Speichern</button>
             </form>

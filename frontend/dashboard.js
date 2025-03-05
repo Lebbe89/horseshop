@@ -6,7 +6,13 @@ const ACCESSKEY = localStorage.getItem("access");
 if (!ACCESSKEY) {
   window.location.href = "../index.html";
 }
-
+th.onclick = () => {
+    sortTable(index);
+    th.innerHTML = `${key.charAt(0).toUpperCase() + key.slice(1)} <span>${table.getAttribute("data-sort") === "asc" ? "⬆️" : "⬇️"}</span>`;
+};
+function changeTitle(title) {
+    document.getElementById("page-title").innerText = title;
+}
 function clearTable() {
     let tableHeader = document.getElementById("table-header");
     let tableBody = document.getElementById("table-body");
@@ -33,6 +39,7 @@ function clearTable() {
 
 function loadHorse() {
     clearTable(); // Tabelle und Header leeren
+    changeTitle("Horse");
     // Überprüfen, ob der "Hinzufügen"-Button bereits existiert, um Duplikate zu vermeiden
     if (!document.getElementById("add-horse-btn")) {
         let addButton = document.createElement("button");
@@ -66,15 +73,15 @@ function loadHorse() {
         if (data && Array.isArray(data) && data.length > 0) {
             // Dynamische Erstellung des Tabellenkopfes
             let headerRow = document.createElement("tr");
-            Object.keys(data[0]).forEach((key) => {
+            Object.keys(data[0]).forEach((key, index) => {
                 let th = document.createElement("th");
                 th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+                th.onclick = () => sortTable(index);
                 headerRow.appendChild(th);
             });
 
              // Zusätzliche Spalte für Aktionen (Bearbeiten und Löschen)
              let actionTh = document.createElement("th");
-             actionTh.textContent = "Aktionen"; // Statt des Buttons einfach "Aktionen" als Spaltenüberschrift
              headerRow.appendChild(actionTh);
  
              document.getElementById("table-header").appendChild(headerRow);
@@ -113,7 +120,7 @@ function loadHorse() {
 
 function loadEmployee() {
     clearTable();
-
+    changeTitle("Employee");
     // Überprüfen, ob der "Hinzufügen"-Button bereits existiert, um Duplikate zu vermeiden
     if (!document.getElementById("add-employee-btn")) {
         let addButton = document.createElement("button");
@@ -146,15 +153,15 @@ function loadEmployee() {
     .then((data) => {
         if (data && Array.isArray(data) && data.length > 0) {
             let headerRow = document.createElement("tr");
-            Object.keys(data[0]).forEach((key) => {
+            Object.keys(data[0]).forEach((key, index) => {
                 let th = document.createElement("th");
                 th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+                th.onclick = () => sortTable(index);
                 headerRow.appendChild(th);
             });
 
             // Zusätzliche Spalte für Aktionen (Bearbeiten und Löschen)
             let actionTh = document.createElement("th");
-            actionTh.textContent = "Aktionen"; 
             headerRow.appendChild(actionTh);
 
             document.getElementById("table-header").appendChild(headerRow);
@@ -189,6 +196,7 @@ function loadEmployee() {
 
 function loadFood() {
     clearTable(); // Tabelle und Header leeren
+    changeTitle("Food");
 
         // Überprüfen, ob der "Hinzufügen"-Button bereits existiert, um Duplikate zu vermeiden
         if (!document.getElementById("add-food-btn")) {
@@ -223,15 +231,15 @@ function loadFood() {
         if (data && Array.isArray(data) && data.length > 0) {
             // Dynamische Erstellung des Tabellenkopfes
             let headerRow = document.createElement("tr");
-            Object.keys(data[0]).forEach((key) => {
+            Object.keys(data[0]).forEach((key, index) => {
                 let th = document.createElement("th");
                 th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+                th.onclick = () => sortTable(index);
                 headerRow.appendChild(th);
             });
 
           // Zusätzliche Spalte für Aktionen (Bearbeiten und Löschen)
           let actionTh = document.createElement("th");
-          actionTh.textContent = "Aktionen"; // Statt des Buttons einfach "Aktionen" als Spaltenüberschrift
           headerRow.appendChild(actionTh);
 
           document.getElementById("table-header").appendChild(headerRow);
@@ -363,7 +371,7 @@ function openModal(entity, id, data) {
         data = {};
         headerCells.forEach(cell => {
             let key = cell.textContent.toLowerCase().replace(/ /g, '_');
-            if (key !== "aktionen") {
+            if (key !== "") {
                 data[key] = "";
             }
         });
@@ -382,7 +390,7 @@ function openModal(entity, id, data) {
                 let select = document.createElement("select");
                 select.setAttribute("id", key);
                 select.setAttribute("name", key);
-                select.required = true;
+                // select.required = true;
 
                 let options = [
                     { value: "", text: "Bitte wählen" },
@@ -410,7 +418,7 @@ function openModal(entity, id, data) {
                 let select = document.createElement("select");
                 select.setAttribute("id", key);
                 select.setAttribute("name", key);
-                select.required = true;
+                // select.required = true;
 
                 let options = [
                     { value: "", text: "Bitte wählen" },
@@ -622,6 +630,17 @@ function createNewEntry(entity) {
         newData[input.id] = input.value;
     });
 
+    if (entity === "horse") {
+        let age = parseInt(newData["age"], 10) || 0; // Alter als Zahl konvertieren, Standard 0 falls leer
+
+        if (!newData["location"] || newData["location"].trim() === "") { 
+            newData["location"] = (age > 25) ? "slaughterhouse" : "stable";
+        }
+
+        if (!newData["sex"] || newData["sex"].trim() === "") { 
+            newData["sex"] = "male";
+        }
+    }
     fetch(`http://127.0.0.1:8000/api/${entity}/`, {
         method: "POST",
         headers: {
@@ -653,4 +672,184 @@ function createNewEntry(entity) {
 function closeModal() {
     document.getElementById("editModal").style.display = "none";
     document.getElementById("editForm").innerHTML = "";
+}
+
+
+function sortTable(columnIndex) {
+    let table = document.getElementById("table-body");
+    let rows = Array.from(table.rows);
+    let isAscending = table.getAttribute("data-sort") !== "asc";
+
+    rows.sort((rowA, rowB) => {
+        let cellA = rowA.cells[columnIndex]?.innerText.trim() || "";
+        let cellB = rowB.cells[columnIndex]?.innerText.trim() || "";
+
+        let numA = parseFloat(cellA);
+        let numB = parseFloat(cellB);
+
+        if (!isNaN(numA) && !isNaN(numB)) {
+            return isAscending ? numA - numB : numB - numA;
+        } else {
+            return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+        }
+    });
+
+    table.setAttribute("data-sort", isAscending ? "asc" : "desc");
+
+    rows.forEach(row => table.appendChild(row));
+
+    updateSortArrows(columnIndex, isAscending);
+}
+
+function updateSortArrows(columnIndex, isAscending) {
+    let headers = document.querySelectorAll("#table-header th");
+
+    headers.forEach((th, index) => {
+        if (index === columnIndex) {
+            th.innerHTML = th.innerText.split(" ")[0] + (isAscending ? " ▲" : " ▼");
+        } else {
+            th.innerHTML = th.innerText.split(" ")[0] + " ⇅"; 
+        }
+    });
+}
+
+
+
+function updateSortArrows(columnIndex, isAscending) {
+    let headers = document.querySelectorAll("#table-header th");
+    document.getElementById("searchInput").addEventListener("input", globalSearch);
+    headers.forEach((th, index) => {
+        if (index === columnIndex) {
+            th.setAttribute("data-sort", isAscending ? "asc" : "desc");
+            th.innerHTML = th.innerText.split(" ")[0] + (isAscending ? " ▲" : " ▼");
+        } else {
+            th.setAttribute("data-sort", "");
+            th.innerHTML = th.innerText.split(" ")[0] + " ⇅"; // Standard-Symbol für nicht sortierte Spalten
+        }
+    });
+}
+
+
+function filterTable() {
+    let input = document.getElementById("searchInput").value.toLowerCase();
+    let rows = document.getElementById("table-body").getElementsByTagName("tr");
+
+    for (let row of rows) {
+        let cells = row.getElementsByTagName("td");
+        let found = false;
+
+        for (let cell of cells) {
+            if (cell.textContent.toLowerCase().includes(input)) {
+                found = true;
+                break;
+            }
+        }
+
+        row.style.display = found ? "" : "none";
+    }
+}
+let allData = [];
+
+function loadAllData() {
+    allData = []; // Vorherige Daten leeren
+
+    let endpoints = ["horse", "employee", "food"];
+    let fetchPromises = endpoints.map(endpoint =>
+        fetch(`http://127.0.0.1:8000/api/${endpoint}/`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: `Bearer ${ACCESSKEY}`,
+            },
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`Fehler beim Laden von ${endpoint}`);
+            return response.json();
+        })
+        .then(data => {
+            data.forEach(item => {
+                item.entityType = endpoint; // Kennzeichnen, um die Quelle zu erkennen
+                allData.push(item);
+            });
+        })
+        .catch(error => console.error(`Fehler beim Abrufen von ${endpoint}:`, error))
+    );
+
+    Promise.all(fetchPromises).then(() => {
+        console.log("Alle Daten geladen:", allData);
+        displayAllData(allData);
+    });
+}
+
+
+function editEntity(entity, id) {
+    fetch(`http://127.0.0.1:8000/api/${entity}/${id}/`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${ACCESSKEY}`,
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            alert("Fehler beim Laden der Daten.");
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        openModal(entity, id, data);
+    })
+    .catch(error => console.error("Fetch error:", error));
+}
+
+function deleteEntity(entity, id) {
+    if (confirm("Möchten Sie diesen Eintrag wirklich löschen?")) {
+        fetch(`http://127.0.0.1:8000/api/${entity}/${id}/`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: `Bearer ${ACCESSKEY}`,
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("Eintrag wurde erfolgreich gelöscht.");
+                loadAllData();
+            } else {
+                alert("Fehler beim Löschen. Bitte versuchen Sie es erneut.");
+            }
+        })
+        .catch(error => {
+            console.error("Fetch error:", error);
+            alert("Fehler beim Löschen der Daten.");
+        });
+    }
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("searchInput").addEventListener("input", globalSearch);
+});
+
+async function globalSearch() {
+    let query = document.getElementById("searchInput").value.toLowerCase();
+
+    if (query.length < 2) { // Suchanfrage erst ab 2 Zeichen
+        displayAllData(allData);
+        return;
+    }
+
+    try {
+        let response = await fetch(`http://127.0.0.1:8000/api/search?query=${query}`, {
+            headers: { "authorization": `Bearer ${ACCESSKEY}` }
+        });
+
+        if (!response.ok) throw new Error("Fehler bei der Suche");
+
+        let data = await response.json();
+        displayAllData(data);
+    } catch (error) {
+        console.error("Fetch error:", error);
+    }
 }
